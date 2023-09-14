@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -7,13 +8,18 @@ public class MyTrieSet implements TrieSet61B {
 	private class Node {
 		public HashMap<Character, Node> map;
 		public boolean isKey;
+		char val;
 		public Node() {
 			map = new HashMap<>();
 		}
 		public Node(Character c, boolean isKey) {
 			this();
 			map.put(c, new Node());
+			this.val = c;
 			this.isKey = isKey;
+		}
+		public boolean isLeaf() {
+			return map.isEmpty();
 		}
 	}
 	
@@ -59,8 +65,28 @@ public class MyTrieSet implements TrieSet61B {
 	public List<String> keysWithPrefix(String prefix) {
 		// start at root, find the next node at char prefix 0,
 		// continue for prefix length
+		Node curr = root;
+		for (int i=0; i < prefix.length(); i++) {
+			char c = prefix.charAt(i);
+			curr = curr.map.get(c);
+		}
 		// from there look for nodes for isKey true and add to the list
-		return null;
+		ArrayList<String> words = new ArrayList<>();
+		for (Node child : curr.map.values()) {
+			findWords(child, words, prefix);
+		}
+		return words;
+	}
+	
+	private List<String> findWords(Node x, ArrayList<String> words, String path) {
+		path = path + x.val;
+		if (x.isKey) {
+			words.add(path);
+		}
+		for (Node child : x.map.values()) {
+			findWords(child, words, path);
+		}
+		return words;
 	}
 	
 	@Override
